@@ -2,6 +2,8 @@
 #define GAME_RESOURCES_H
 //------------------------------------
 
+#include "map.h"
+#include "character.h"
 #include "entity.h"
 
 #include <vector>
@@ -16,22 +18,15 @@ class GameResources{
 			int8_t cols;
 		} Map;
 		typedef struct _Character{
-			int8_t x;
-			int8_t y;
+			int8_t row;
+			int8_t col;
 		} Character;
-		typedef struct _Entity{
-			SDL_Texture* texture;
-			SDL_Rect srcrect;
-			SDL_Rect dstrect;
-			double angle;
-			SDL_Point center;
-			SDL_RendererFlip flip;
-		} Entity;
 	private:
 		Map map;
 		Character chaser;
 		Character runner;
 		std::vector<Entity> entities;
+		PathFinder path_finder;
 		uint8_t state;
 	public:
 		GameResources();
@@ -39,9 +34,6 @@ class GameResources{
 	private:
 		GameResources(const GameResources&) = delete;
 		GameResources& operator=(const GameResources&) = delete;
-
-	friend class Updater;
-	friend class Renderer;
 };
 
 //------------------------------------

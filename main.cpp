@@ -18,7 +18,7 @@ int main(){
 	GameResource game;
 	EventHandler events;
 	//Loop
-	while(sdl.State()==SDL_GOOD && game.State()==GAME_GOOD){
+	while((sdl.State()|game.State()|events.State())!=0x00){
 		sdl.Update();
 		events.Update();
 		game.Update(sdl, events);
