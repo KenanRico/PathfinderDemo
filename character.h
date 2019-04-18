@@ -9,7 +9,7 @@ class Character{
 		uint8_t render_entity_index;
 
 	public:
-		Character();
+		Character(int, int);
 		~Character();
 	private:
 		Character(const Character&) = delete;
