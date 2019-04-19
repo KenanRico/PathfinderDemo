@@ -6,7 +6,7 @@
 #include "character.h"
 #include "entity.h"
 
-#include <vector>
+#include <deque>
 
 #define GAME_GOOD 0
 
@@ -25,7 +25,7 @@ class GameResources{
 		Map map;
 		Character chaser;
 		Character runner;
-		std::vector<Entity> entities;
+		std::deque<Entity> entities;
 		PathFinder path_finder;
 		uint8_t state;
 	public:

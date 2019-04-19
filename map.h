@@ -1,13 +1,19 @@
 #ifndef MAP_H
 #define MAP_H
 //-----------------------------------
+
+#include "entity.h"
+
+#include <vector>
+#include <stdint.h>
+
 class Map{
 	private:
 		std::vector<float> mapping;
 		uint16_t rows;
 		uint16_t cols;
-		uint8_t render_path_index;
-		uint8_t render_wall_index;
+		Entity* path;
+		Entity* wall;
 	public:
 		Map(const char*);
 		~Map();
@@ -16,7 +22,7 @@ class Map{
 		Map(const Map&) = delete;
 		Map& operator=(const Map&) = delete;
 	public:
-		void SetRenderIndices(uint8_t, uint8_t);
+		void SetRenderEntities(Entity*, Entity*);
 };
 //-----------------------------------
 #endif
