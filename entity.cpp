@@ -2,19 +2,28 @@
 
 #include <SDL2/SDL.h>
 
-Entity::Entity(): 
+Entity::Entity():
 texture(nullptr),
-srcrect({0,0,0,0}),
-dstrect({0,0,0,0}),
+srect({0,0,0,0}),
+drect({0,0,0,0}),
 angle(0.0),
-center(0,0),
-flip(NO_FLIP){
+center({0,0}),
+flip(SDL_FLIP_NONE),
+enabled(false){
 
 
 }
 
-~Entity(){
+Entity::~Entity(){
 	if(texture!=nullptr){
-		SDL_FreeTexture(texture);
+		SDL_DestroyTexture(texture);
 	}
+}
+
+void Entity::Enable(){
+	enabled = true;
+}
+
+void Entity::Disable(){
+	enabled = false;
 }

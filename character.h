@@ -1,12 +1,14 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 //-------------------------------------
+
+#include "entity.h"
+
 class Character{
 	public:
 		int row;
 		int col;
-	private:
-		uint8_t render_entity_index;
+		Entity* render_entity;
 
 	public:
 		Character(int, int);
@@ -16,7 +18,7 @@ class Character{
 		Character& operator=(const Character&) = delete;
 
 	public:
-		void setRenderEntityIndex(uint8_t);
+		void SetRenderEntity(Entity* e);
 };
 //-------------------------------------
 #endif

@@ -1,8 +1,11 @@
 #include "sdlresources.h"
+#include "eventhandler.h"
+#include "gameresources.h"
 
 #include <iostream>
 
 #include <SDL2/SDL.h>
+#include <SDL2/extensions/SDL_image.h>
 
 
 #ifdef main
@@ -12,19 +15,14 @@
 
 int main(){
 	SDLResources sdl;
-	while(sdl.State()==SDL_GOOD);
-	/*
-	//Resource class
-	GameResource game;
 	EventHandler events;
-	//Loop
-	while((sdl.State()|game.State()|events.State())!=0x00){
+	GameResources game(sdl);
+	while((sdl.State()|events.State()|game.State())==0x00){
 		sdl.Update();
 		events.Update();
-		game.Update(sdl, events);
+		game.Update(events, sdl);
 		game.Render(sdl);
 	}
-	std::cout<<"SDL state: "<<sdl.State()<<"\nGame state: "<<game.State()<<"\n";
-	*/
+	std::cout<<"SDL state: "<<sdl.State()<<"\nEvent state: "<<events.State()<<"\n";
     return 0;
 }

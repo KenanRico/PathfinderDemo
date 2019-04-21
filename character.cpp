@@ -1,7 +1,9 @@
 #include "character.h"
 
+#include "entity.h"
 
-Character::Character(int r, int c): row(r), col(c), render_entity_index(0){
+
+Character::Character(int r, int c): row(r), col(c), render_entity(0){
 
 }
 
@@ -10,6 +12,6 @@ Character::~Character(){
 
 }
 
-void Character::setRenderEntityIndex(uint8_t i){
-	render_entity_index = i;
+void Character::SetRenderEntity(Entity* e){
+	render_entity = e;
 }

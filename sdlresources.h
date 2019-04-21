@@ -6,11 +6,14 @@
 
 #include <SDL2/SDL.h>
 
-#define SDL_GOOD 0
-#define SDL_INIT_FAILED 1
-#define SDL_WINDOW_CREATE_FAILED 2
-#define SDL_RENDERER_CREATE_FAILED 3
-#define SDL_RENDER_FAILED 4
+#define SDLR_GOOD 0
+#define SDLR_INIT_FAILED 1
+#define SDLR_WINDOW_CREATE_FAILED 2
+#define SDLR_RENDERER_CREATE_FAILED 3
+#define SDLR_RENDER_FAILED 4
+
+#define SDLR_FPS 60
+
 
 class SDLResources{
 	private:
@@ -18,6 +21,7 @@ class SDLResources{
 		int window_width;
 		int window_height;
 		SDL_Renderer* renderer;
+		uint64_t frame_timestamp;
 		uint8_t state;
 	public:
 		SDLResources();
@@ -28,9 +32,9 @@ class SDLResources{
 	public:
 		uint8_t State() const;
 		SDL_Renderer* GetRenderer() const;
-		//void Render(const std::vector<Entity>&);
-
-	friend class Updater;
+		void Update();
+		int WindowW() const;
+		int WindowH() const;
 };
 
 //---------------------------------------

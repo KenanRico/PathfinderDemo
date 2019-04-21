@@ -5,35 +5,37 @@
 #include "map.h"
 #include "character.h"
 #include "entity.h"
+#include "sdlresources.h"
+#include "eventhandler.h"
+#include "pathfinding/pathfinder.h"
 
 #include <deque>
+#include <stdint.h>
 
 #define GAME_GOOD 0
+#define GAME_IMG_LOAD_FAIL 1
+#define GAME_OVER 2
 
 class GameResources{
-	public:
-		typedef struct _Map{
-			std::vector<float> mapping;
-			int8_t rows;
-			int8_t cols;
-		} Map;
-		typedef struct _Character{
-			int8_t row;
-			int8_t col;
-		} Character;
 	private:
 		Map map;
-		Character chaser;
-		Character runner;
+		Character chaser; uint64_t chaser_timer;
+		Character runner; uint64_t runner_timer;
 		std::deque<Entity> entities;
-		PathFinder path_finder;
+		Kha::PathFinder path_finder;
 		uint8_t state;
 	public:
-		GameResources();
+		GameResources(const SDLResources&);
 		~GameResources();
 	private:
+		GameResources() = delete;
 		GameResources(const GameResources&) = delete;
 		GameResources& operator=(const GameResources&) = delete;
+
+	public:
+		void Update(const EventHandler&, const SDLResources&);
+		void Render(const SDLResources&);
+		uint8_t State() const;
 };
 
 //------------------------------------
