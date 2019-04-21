@@ -50,31 +50,6 @@ void SDLResources::Update(){
 	}
 }
 
-/*
-void SDLResources::Render(const std::vector<Entity>& entities){
-	SDL_RenderClear(renderer);
-	uint8_t size = entities.size();
-	for(uint8_t i=0; i<size; ++i){
-		Entity& entity = entities.at();
-		if(
-			SDL_RenderCopyEx(
-				renderer,
-				entity.texture,
-				entity.srcrect,
-				entity.dstrect,
-				entity.angle,
-				entity.center,
-				entity.hflip|entity.vflip
-			) != 0
-		){
-			state = SDLR_RENDER_FAILED;
-			break;
-		}
-	}
-	SDL_RenderPresent(renderer);
-}
-*/
-
 int SDLResources::WindowW() const{
 	return window_width;
 }
