@@ -7,6 +7,7 @@
 
 #include <deque>
 #include <iostream>
+#include <cmath>
 
 #include <SDL2/SDL.h>
 #include <SDL2/extensions/SDL_image.h>
@@ -109,7 +110,7 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 		runner_entity.drect.h = box_height;
 	}
 	//update chaser
-	if(chaser_timer++ % 5 == 0){
+	if(chaser_timer++%5==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
 		const std::vector<float>& mapping = map.GetMapping();
 #ifdef PATHFINDING
 		if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
