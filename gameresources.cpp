@@ -8,6 +8,7 @@
 #include <deque>
 #include <iostream>
 #include <cmath>
+#include <cstring>
 
 #include <SDL2/SDL.h>
 #include <SDL2/extensions/SDL_image.h>
@@ -97,7 +98,7 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 	map_wall.drect.w = box_width;
 	map_wall.drect.h = box_height;
 	//update runner
-	if(runner_timer++ % 4 == 0){
+	if(runner.timer++ % (10-runner.speed) == 0){
 		const std::vector<float>& mapping = map.GetMapping();
 		if(events[EventHandler::S] && runner.row<map.rows && mapping[(runner.row+1)*map.cols+runner.col]==-1.0){
 			runner.row += 1;
@@ -127,7 +128,7 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 	//update chaser
 	for(int i=0; i<chasers.size(); ++i){
 		Character& chaser = chasers[i];
-		if(chaser_timer%5==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
+		if(chaser.timer++%(10-chaser.speed)==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
 			const std::vector<float>& mapping = map.GetMapping();
 #ifdef PATHFINDING
 			if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
@@ -142,7 +143,9 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 			chaser_entity.drect.w = box_width;
 			chaser_entity.drect.h = box_height;
 		}
-		++chaser_timer;
+	}
+	if(...){
+		level_complete = true;
 	}
 }
 
@@ -164,11 +167,89 @@ void GameResources::Render(const SDLResources& sdl){
 	size = entities.size();
 	for(int i=2; i<size; ++i){
 		Entity& entity = entities.at(i);
+		if(!entity.enabled) continue;
 		SDL_RenderCopyEx(renderer, entity.texture, &entity.srect, &entity.drect, entity.angle, nullptr, entity.flip);
 	}
 	SDL_RenderPresent(renderer);
+	if(level_complete){
+		LoadNextLevel();
+		level_complete = false;
+	}
 }
 
 uint8_t GameResources::State() const{
 	return state;
+}
+
+void GameResources::LoadNextLevel(){
+	//settings
+	std::string map_dimensions = "";
+	std::vector<std::string> map_mapping;
+	std::string map_entrance = "";
+	std::string map_exit= "";
+	std::vector<std::string> chasers;
+	std::string new_level = "";
+	//parse file
+	std::ifstream ifs(next_level.c_str());
+	std::string line = "";
+	bool parse_complete = false;
+	while(!parse_complete){
+		getline(ifs, line);
+		if(line.at(0)=='>'){
+			switch(line){
+				case ">map_dimensions":
+					getline(ifs, line);
+					int cols = 0; int rows = 0;
+					std::stringstream(line)>>cols>>rows;
+					map.cols = cols; map.rows = rows;
+					break;
+				case ">chasers":
+			}
+		}else{
+
+		}
+	}
+
+
+
+
+	chasers.clear();
+	if(next_level == ""){
+		state = GAME_COMPLETE;
+		return;
+	};
+	std::vector<std::string> file_content;
+	std::ifstream ifs(next_level.c_str());
+	std::string line = "";
+	while(getline(ifs, line)){
+		file_content.push_back(line);
+	}
+	//map properties
+	int rows = 0; int cols = 0; std::string mapping_str = "";
+	for(int i=0; i<file_content.size(); ++i){
+		if(file_content.at(i).at(0)=='>'){
+			switch(file_content.at(i)){
+				case ">map_dimensions":
+					std::stringstream(file_content[++i])>>rows>>cols;
+					break;
+				case ">map_mapping":
+				case ">map_entrance":
+				case ">map_exit":
+				case ">chasers":
+					++i;
+					while(file_content.at(i).at(0)!='>'){
+						int r = 0; int c = 0;
+						std::stringstream(file_content[i++])>>r>>c;
+						chasers.push_back(Character(r,c));
+						chasers[].texture = ...;
+					}
+					break;
+				case ">new_level":
+					
+			}
+		}else{
+			state = GAME_LOAD_LEVEL_FAIL;
+			break;
+		}
+	}
 }

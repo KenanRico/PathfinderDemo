@@ -4,11 +4,15 @@
 
 #include "entity.h"
 
+#include <stdint.h>
+
 class Character{
 	public:
 		int row;
 		int col;
 		Entity* render_entity;
+		uint64_t timer;
+		int speed; //1~10
 
 	public:
 		Character(int, int);

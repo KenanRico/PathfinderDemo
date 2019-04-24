@@ -6,28 +6,23 @@
 #include <iostream>
 
 
-Map::Map(const char* config_file): path(nullptr), wall(nullptr){
-	std::ifstream fs(config_file);
-	//fetch map dimensions from config
-	std::string line = "";
-	getline(fs, line);
-	std::stringstream ss(line);
-	ss>>rows>>cols;
-	//fetch mapping from config
-	std::string mapping_str = "";
-	while(getline(fs, line)){
-		mapping_str += line+" ";
-	}
-	mapping.resize(rows*cols);
-	std::stringstream ss2(mapping_str);
-	//for(uint16_t i=0; i<size; ++i){
-	int i = 0;
-	while(ss2>>mapping[i++]);
+Map::Map(): mapping(nullptr), path(nullptr), wall(nullptr){
 }
 
 Map::~Map(){
+	if(mapping!=nullptr) delete mapping;
 	path->Disable();
 	wall->Disable();
+}
+
+void Map::ConfigMapping(int r, int c, const std::string& mapping_str){
+	if(mapping!=nullptr) delete mapping;
+	mapping = new std::vector<float>;
+	rows = r; cols = c;
+	mapping->resize(rows*cols);
+	std::stringstream ss2(mapping_str);
+	int i = 0;
+	while(ss2>>*mapping[i++]);
 }
 
 void Map::SetRenderEntities(Entity* p, Entity* w){
@@ -38,5 +33,5 @@ void Map::SetRenderEntities(Entity* p, Entity* w){
 }
 
 const std::vector<float>& Map::GetMapping() const{
-	return mapping;
+	return *mapping;
 }

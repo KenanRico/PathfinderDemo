@@ -12,19 +12,24 @@
 #include <deque>
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 #define GAME_GOOD 0
 #define GAME_IMG_LOAD_FAIL 1
-#define GAME_OVER 2
+#define GAME_LEVEL_LOAD_FAIL 2
+#define GAME_COMPLETE 3
+#define GAME_OVER 4
 
 class GameResources{
 	private:
 		Map map;
 		//Character chaser; uint64_t chaser_timer;
-		std::vector<Character> chasers; uint64_t chaser_timer;
-		Character runner; uint64_t runner_timer;
+		std::vector<Character> chasers;
+		Character runner;
 		std::deque<Entity> entities;
 		Kha::PathFinder path_finder;
+		bool level_complete;
+		std::string next_level;
 		uint8_t state;
 	public:
 		GameResources(const SDLResources&);
@@ -38,6 +43,8 @@ class GameResources{
 		void Update(const EventHandler&, const SDLResources&);
 		void Render(const SDLResources&);
 		uint8_t State() const;
+	private:
+		void LoadNextLevel();
 };
 
 //------------------------------------
