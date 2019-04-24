@@ -3,7 +3,7 @@
 #include "entity.h"
 
 
-Character::Character(int r, int c): row(r), col(c), render_entity(0){
+Character::Character(int r, int c): row(r), col(c), render_entity(nullptr){
 
 }
 

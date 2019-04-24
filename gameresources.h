@@ -11,6 +11,7 @@
 
 #include <deque>
 #include <stdint.h>
+#include <vector>
 
 #define GAME_GOOD 0
 #define GAME_IMG_LOAD_FAIL 1
@@ -19,7 +20,8 @@
 class GameResources{
 	private:
 		Map map;
-		Character chaser; uint64_t chaser_timer;
+		//Character chaser; uint64_t chaser_timer;
+		std::vector<Character> chasers; uint64_t chaser_timer;
 		Character runner; uint64_t runner_timer;
 		std::deque<Entity> entities;
 		Kha::PathFinder path_finder;

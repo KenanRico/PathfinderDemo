@@ -14,7 +14,7 @@ class Character{
 		Character(int, int);
 		~Character();
 	private:
-		Character(const Character&) = delete;
+		Character() = delete;
 		Character& operator=(const Character&) = delete;
 
 	public:

@@ -15,8 +15,8 @@
 #define PATHFINDING
 
 
-GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), map("maps/map1.conf"), chaser(21, 2), chaser_timer(0), runner(8, 42), runner_timer(0){
-	entities.resize(4, Entity());
+GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), map("maps/map1.conf"), chaser_timer(0), runner(8, 42), runner_timer(0){
+	entities.resize(5, Entity());
 	SDL_Renderer* r = sdl.GetRenderer();
 	//config map
 	map.SetRenderEntities(&entities.at(0), &entities.at(1));
@@ -47,15 +47,28 @@ GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), map("ma
 	SDL_QueryTexture(runner.render_entity->texture, nullptr, nullptr, &runner.render_entity->srect.w, &runner.render_entity->srect.h);
 	SDL_FreeSurface(surface);
 
-	chaser.SetRenderEntity(&entities.at(3));
+	chasers.reserve(2);
+	chasers.push_back(std::move(Character(39, 0)));
+	chasers[0].SetRenderEntity(&entities.at(3));
 	surface = IMG_Load("textures/chaser.png");
 	if(surface==nullptr){
 		state = GAME_IMG_LOAD_FAIL;
 		return;
 	}
-	chaser.render_entity->texture = SDL_CreateTextureFromSurface(r, surface);
-	SDL_QueryTexture(chaser.render_entity->texture, nullptr, nullptr, &chaser.render_entity->srect.w, &chaser.render_entity->srect.h);
+	chasers[0].render_entity->texture = SDL_CreateTextureFromSurface(r, surface);
+	SDL_QueryTexture(chasers[0].render_entity->texture, nullptr, nullptr, &chasers[0].render_entity->srect.w, &chasers[0].render_entity->srect.h);
 	SDL_FreeSurface(surface);
+	chasers.push_back(std::move(Character(36, 2)));
+	chasers[1].SetRenderEntity(&entities.at(4));
+	surface = IMG_Load("textures/chaser.png");
+	if(surface==nullptr){
+		state = GAME_IMG_LOAD_FAIL;
+		return;
+	}
+	chasers[1].render_entity->texture = SDL_CreateTextureFromSurface(r, surface);
+	SDL_QueryTexture(chasers[1].render_entity->texture, nullptr, nullptr, &chasers[1].render_entity->srect.w, &chasers[1].render_entity->srect.h);
+	SDL_FreeSurface(surface);
+
 }
 
 GameResources::~GameResources(){
@@ -66,9 +79,11 @@ GameResources::~GameResources(){
 
 void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 	//game end check
-	if(chaser.row==runner.row && chaser.col==runner.col){
-		state = GAME_OVER;
-		return;
+	for(int i=0; i<chasers.size(); ++i){
+		if(chasers[i].row==runner.row && chasers[i].col==runner.col){
+			state = GAME_OVER;
+			return;
+		}
 	}
 	int window_width = sdl.WindowW();
 	int window_height = sdl.WindowH();
@@ -110,20 +125,24 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 		runner_entity.drect.h = box_height;
 	}
 	//update chaser
-	if(chaser_timer++%5==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
-		const std::vector<float>& mapping = map.GetMapping();
+	for(int i=0; i<chasers.size(); ++i){
+		Character& chaser = chasers[i];
+		if(chaser_timer%5==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
+			const std::vector<float>& mapping = map.GetMapping();
 #ifdef PATHFINDING
-		if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
-			const std::vector<Kha::Pos>& route = path_finder.GetRoute();
-			chaser.row = route.at(0).row;
-			chaser.col = route.at(0).col;
-		}
+			if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
+				const std::vector<Kha::Pos>& route = path_finder.GetRoute();
+				chaser.row = route.at(0).row;
+				chaser.col = route.at(0).col;
+			}
 #endif
-		Entity& chaser_entity = *chaser.render_entity;
-		chaser_entity.drect.x = window_width*chaser.col/map.cols;
-		chaser_entity.drect.y = window_height*chaser.row/map.rows;
-		chaser_entity.drect.w = box_width;
-		chaser_entity.drect.h = box_height;
+			Entity& chaser_entity = *chaser.render_entity;
+			chaser_entity.drect.x = window_width*chaser.col/map.cols;
+			chaser_entity.drect.y = window_height*chaser.row/map.rows;
+			chaser_entity.drect.w = box_width;
+			chaser_entity.drect.h = box_height;
+		}
+		++chaser_timer;
 	}
 }
 
