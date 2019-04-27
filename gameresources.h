@@ -14,11 +14,16 @@
 #include <vector>
 #include <string>
 
+#include <SDL2/SDL.h>
+
 #define GAME_GOOD 0
 #define GAME_IMG_LOAD_FAIL 1
 #define GAME_LEVEL_LOAD_FAIL 2
-#define GAME_COMPLETE 3
-#define GAME_OVER 4
+#define	GAME_LEVEL_LOAD_FAIL_NOLEVEL 3
+#define	GAME_LEVEL_LOAD_FAIL_UNRECOGNIZEDSETTING 4
+#define	GAME_LEVEL_LOAD_FAIL_BADFORMAT 5
+#define GAME_COMPLETE 6
+#define GAME_OVER 7
 
 class GameResources{
 	private:
@@ -44,7 +49,7 @@ class GameResources{
 		void Render(const SDLResources&);
 		uint8_t State() const;
 	private:
-		void LoadNextLevel();
+		void LoadNextLevel(SDL_Renderer*);
 };
 
 //------------------------------------

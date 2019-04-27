@@ -23,6 +23,6 @@ int main(){
 		game.Update(events, sdl);
 		game.Render(sdl);
 	}
-	std::cout<<"SDL state: "<<(int)sdl.State()<<"\nEvent state: "<<(int)events.State()<<(int)game.State()<<"\n";
+	std::cout<<"SDL state: "<<(int)sdl.State()<<"\nEvent state: "<<(int)events.State()<<"\nGame stat: "<<(int)game.State()<<"\n";
     return 0;
 }

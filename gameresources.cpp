@@ -9,18 +9,19 @@
 #include <iostream>
 #include <cmath>
 #include <cstring>
+#include <fstream>
+#include <sstream>
 
 #include <SDL2/SDL.h>
 #include <SDL2/extensions/SDL_image.h>
 
-#define PATHFINDING
 
 
-GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), map("maps/map1.conf"), chaser_timer(0), runner(8, 42), runner_timer(0){
+GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), next_level("maps/level_1.map"){
 	entities.resize(5, Entity());
 	SDL_Renderer* r = sdl.GetRenderer();
 	//config map
-	map.SetRenderEntities(&entities.at(0), &entities.at(1));
+	map.SetRenderEntities(&entities.at(0), &entities.at(1), &entities.at(2), &entities.at(3));
 	SDL_Surface* surface = IMG_Load("textures/path.png");
 	if(surface==nullptr){
 		state = GAME_IMG_LOAD_FAIL;
@@ -37,8 +38,24 @@ GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), map("ma
 	map.wall->texture = SDL_CreateTextureFromSurface(r, surface);
 	SDL_FreeSurface(surface);
 	SDL_QueryTexture(map.wall->texture, nullptr, nullptr, &map.wall->srect.w, &map.wall->srect.h);
-	//characters
-	runner.SetRenderEntity(&entities.at(2));
+	surface = IMG_Load("textures/entrance.png");
+	if(surface==nullptr){
+		state = GAME_IMG_LOAD_FAIL;
+		return;
+	}
+	map.entrance->texture = SDL_CreateTextureFromSurface(r, surface);
+	SDL_FreeSurface(surface);
+	SDL_QueryTexture(map.entrance->texture, nullptr, nullptr, &map.entrance->srect.w, &map.entrance->srect.h);
+	surface = IMG_Load("textures/exit.png");
+	if(surface==nullptr){
+		state = GAME_IMG_LOAD_FAIL;
+		return;
+	}
+	map.exit->texture = SDL_CreateTextureFromSurface(r, surface);
+	SDL_FreeSurface(surface);
+	SDL_QueryTexture(map.exit->texture, nullptr, nullptr, &map.exit->srect.w, &map.exit->srect.h);
+	//runner
+	runner.SetRenderEntity(&entities.at(4));
 	surface = IMG_Load("textures/runner.png");
 	if(surface==nullptr){
 		state = GAME_IMG_LOAD_FAIL;
@@ -48,27 +65,7 @@ GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), map("ma
 	SDL_QueryTexture(runner.render_entity->texture, nullptr, nullptr, &runner.render_entity->srect.w, &runner.render_entity->srect.h);
 	SDL_FreeSurface(surface);
 
-	chasers.reserve(2);
-	chasers.push_back(std::move(Character(39, 0)));
-	chasers[0].SetRenderEntity(&entities.at(3));
-	surface = IMG_Load("textures/chaser.png");
-	if(surface==nullptr){
-		state = GAME_IMG_LOAD_FAIL;
-		return;
-	}
-	chasers[0].render_entity->texture = SDL_CreateTextureFromSurface(r, surface);
-	SDL_QueryTexture(chasers[0].render_entity->texture, nullptr, nullptr, &chasers[0].render_entity->srect.w, &chasers[0].render_entity->srect.h);
-	SDL_FreeSurface(surface);
-	chasers.push_back(std::move(Character(36, 2)));
-	chasers[1].SetRenderEntity(&entities.at(4));
-	surface = IMG_Load("textures/chaser.png");
-	if(surface==nullptr){
-		state = GAME_IMG_LOAD_FAIL;
-		return;
-	}
-	chasers[1].render_entity->texture = SDL_CreateTextureFromSurface(r, surface);
-	SDL_QueryTexture(chasers[1].render_entity->texture, nullptr, nullptr, &chasers[1].render_entity->srect.w, &chasers[1].render_entity->srect.h);
-	SDL_FreeSurface(surface);
+	LoadNextLevel(r);
 
 }
 
@@ -91,12 +88,30 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 	int box_width = window_width/map.cols;
 	int box_height = window_height/map.rows;
 	//update map
-	Entity& map_path = *map.path;
-	Entity& map_wall = *map.wall;
-	map_path.drect.w = box_width;
-	map_path.drect.h = box_height;
-	map_wall.drect.w = box_width;
-	map_wall.drect.h = box_height;
+	{
+		Entity& entity = *map.path;
+		entity.drect.w = box_width;
+		entity.drect.h = box_height;
+	}
+	{
+		Entity& entity = *map.wall;
+		entity.drect.w = box_width;
+		entity.drect.h = box_height;
+	}
+	{
+		Entity& entity = *map.entrance;
+		entity.drect.x = window_width * map.entrance_col / map.cols;
+		entity.drect.y = window_height * map.entrance_row / map.rows;
+		entity.drect.w = box_width;
+		entity.drect.h = box_height;
+	}
+	{
+		Entity& entity = *map.exit;
+		entity.drect.x = window_width * map.exit_col / map.cols;
+		entity.drect.y = window_height * map.exit_row / map.rows;
+		entity.drect.w = box_width;
+		entity.drect.h = box_height;
+	}
 	//update runner
 	if(runner.timer++ % (10-runner.speed) == 0){
 		const std::vector<float>& mapping = map.GetMapping();
@@ -130,13 +145,11 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 		Character& chaser = chasers[i];
 		if(chaser.timer++%(10-chaser.speed)==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
 			const std::vector<float>& mapping = map.GetMapping();
-#ifdef PATHFINDING
 			if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
 				const std::vector<Kha::Pos>& route = path_finder.GetRoute();
 				chaser.row = route.at(0).row;
 				chaser.col = route.at(0).col;
 			}
-#endif
 			Entity& chaser_entity = *chaser.render_entity;
 			chaser_entity.drect.x = window_width*chaser.col/map.cols;
 			chaser_entity.drect.y = window_height*chaser.row/map.rows;
@@ -144,7 +157,8 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 			chaser_entity.drect.h = box_height;
 		}
 	}
-	if(...){
+	//level is complete if reach exit
+	if(runner.row==map.exit_row && runner.col==map.exit_col){
 		level_complete = true;
 	}
 }
@@ -172,7 +186,7 @@ void GameResources::Render(const SDLResources& sdl){
 	}
 	SDL_RenderPresent(renderer);
 	if(level_complete){
-		LoadNextLevel();
+		LoadNextLevel(renderer);
 		level_complete = false;
 	}
 }
@@ -181,75 +195,98 @@ uint8_t GameResources::State() const{
 	return state;
 }
 
-void GameResources::LoadNextLevel(){
-	//settings
-	std::string map_dimensions = "";
-	std::vector<std::string> map_mapping;
-	std::string map_entrance = "";
-	std::string map_exit= "";
-	std::vector<std::string> chasers;
-	std::string new_level = "";
-	//parse file
-	std::ifstream ifs(next_level.c_str());
-	std::string line = "";
-	bool parse_complete = false;
-	while(!parse_complete){
-		getline(ifs, line);
-		if(line.at(0)=='>'){
-			switch(line){
-				case ">map_dimensions":
-					getline(ifs, line);
-					int cols = 0; int rows = 0;
-					std::stringstream(line)>>cols>>rows;
-					map.cols = cols; map.rows = rows;
-					break;
-				case ">chasers":
-			}
-		}else{
 
-		}
+void GameResources::LoadNextLevel(SDL_Renderer* renderer){
+
+	//deallocate current chasers and release render entities back into entity pool
+	int size = entities.size();
+	for(int i=5; i<size; ++i){
+		entities.at(i).Disable();
 	}
-
-
-
-
 	chasers.clear();
+
+	//if next level don't exist, game is complete
 	if(next_level == ""){
 		state = GAME_COMPLETE;
 		return;
 	};
+
+	//stream file content into big string
 	std::vector<std::string> file_content;
 	std::ifstream ifs(next_level.c_str());
+	if(ifs.fail()){
+		state = GAME_LEVEL_LOAD_FAIL_NOLEVEL;
+		return;
+	}
 	std::string line = "";
 	while(getline(ifs, line)){
 		file_content.push_back(line);
 	}
-	//map properties
+
+	//next level waits to be set
+	next_level = "";
+
+	//parse file content and set up elements for new level
 	int rows = 0; int cols = 0; std::string mapping_str = "";
-	for(int i=0; i<file_content.size(); ++i){
+	for(int i=0; i<file_content.size()-1; ++i){
 		if(file_content.at(i).at(0)=='>'){
-			switch(file_content.at(i)){
-				case ">map_dimensions":
-					std::stringstream(file_content[++i])>>rows>>cols;
-					break;
-				case ">map_mapping":
-				case ">map_entrance":
-				case ">map_exit":
-				case ">chasers":
-					++i;
-					while(file_content.at(i).at(0)!='>'){
-						int r = 0; int c = 0;
-						std::stringstream(file_content[i++])>>r>>c;
-						chasers.push_back(Character(r,c));
-						chasers[].texture = ...;
+			const std::string& new_line = file_content.at(i++);
+			if(new_line==">map_dimensions"){
+				std::stringstream(file_content[i])>>rows>>cols;
+			}else if(new_line==">map_mapping"){
+				while(file_content.at(i).at(0)!='>'){
+					mapping_str += file_content[i++];
+				}
+				--i;
+			}else if(new_line==">map_entrance"){
+				std::stringstream(file_content[i])>>map.entrance_row>>map.entrance_col;
+				runner.row = map.entrance_row;
+				runner.col = map.entrance_col;
+				runner.speed = 6;
+			}else if(new_line==">map_exit"){
+				std::stringstream(file_content[i])>>map.exit_row>>map.exit_col;
+			}else if(new_line==">chasers"){
+				while(file_content.at(i).at(0)!='>'){
+					int r = 0; int c = 0; int s=0;
+					std::stringstream(file_content[i++])>>r>>c>>s;
+					chasers.push_back(Character());
+					Character& new_chaser = chasers.at(chasers.size()-1);
+					new_chaser.row = r;
+					new_chaser.col = c;
+					new_chaser.speed = s;
+					Entity* entity = nullptr;
+					for(int i=5; i<entities.size(); ++i){
+						if(!entities.at(i).enabled){
+							entity = &entities.at(i);
+							break;
+						}
 					}
-					break;
-				case ">new_level":
-					
+					if(entity==nullptr){
+						entities.push_back(Entity());
+						entity = &entities.at(entities.size()-1);
+						SDL_Surface* surface = IMG_Load("textures/chaser.png");
+						if(surface==nullptr){
+							state = GAME_IMG_LOAD_FAIL;
+							return;
+						}
+						entity->texture = SDL_CreateTextureFromSurface(renderer, surface);
+						SDL_QueryTexture(entity->texture, nullptr, nullptr, &entity->srect.w, &entity->srect.h);
+						SDL_FreeSurface(surface);
+					}
+					new_chaser.SetRenderEntity(entity);
+				}
+				--i;
+			}else if(new_line==">new_level"){
+				next_level = std::string("maps/")+file_content.at(i);
+			}else{
+				state = GAME_LEVEL_LOAD_FAIL_UNRECOGNIZEDSETTING;
+				break;
 			}
 		}else{
-			state = GAME_LOAD_LEVEL_FAIL;
+			std::cout<<file_content.at(i)<<"\n";
+			state = GAME_LEVEL_LOAD_FAIL_BADFORMAT;
 			break;
 		}
 	}
+	map.ConfigMapping(rows, cols, mapping_str);
 }

@@ -15,10 +15,9 @@ class Character{
 		int speed; //1~10
 
 	public:
-		Character(int, int);
+		Character();
 		~Character();
 	private:
-		Character() = delete;
 		Character& operator=(const Character&) = delete;
 
 	public:
