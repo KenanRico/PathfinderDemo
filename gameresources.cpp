@@ -115,21 +115,18 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 	//update runner
 	if(runner.timer++ % (10-runner.speed) == 0){
 		const std::vector<float>& mapping = map.GetMapping();
-		if(events[EventHandler::S] && runner.row<map.rows && mapping[(runner.row+1)*map.cols+runner.col]==-1.0){
+		if(events[EventHandler::S] && runner.row<map.rows-1 && mapping[(runner.row+1)*map.cols+runner.col]==-1.0){
 			runner.row += 1;
 			runner.render_entity->angle = 180.0;
 		}
-		//runner.row -= (events[EventHandler::W] && runner.row>0 && mapping[(runner.row-1)*map.cols+runner.col]==-1.0)? 1 : 0;
 		if(events[EventHandler::W] && runner.row>0 && mapping[(runner.row-1)*map.cols+runner.col]==-1.0){
 			runner.row -= 1;
 			runner.render_entity->angle = 0.0;
 		}
-		//runner.col += (events[EventHandler::D] && runner.col<map.cols && mapping[runner.row*map.cols+runner.col+1]==-1.0) ? 1 : 0;
-		if(events[EventHandler::D] && runner.col<map.cols && mapping[runner.row*map.cols+runner.col+1]==-1.0){
+		if(events[EventHandler::D] && runner.col<map.cols-1 && mapping[runner.row*map.cols+runner.col+1]==-1.0){
 			runner.col += 1;
 			runner.render_entity->angle = 90.0;
 		}
-		//runner.col -= (events[EventHandler::A] && runner.col>0 && mapping[runner.row*map.cols+runner.col-1]==-1.0) ? 1 : 0;
 		if(events[EventHandler::A] && runner.col>0 && mapping[runner.row*map.cols+runner.col-1]==-1.0){
 			runner.col -= 1;
 			runner.render_entity->angle = 270.0;
@@ -143,12 +140,14 @@ void GameResources::Update(const EventHandler& events, const SDLResources& sdl){
 	//update chaser
 	for(int i=0; i<chasers.size(); ++i){
 		Character& chaser = chasers[i];
-		if(chaser.timer++%(10-chaser.speed)==0 && sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
-			const std::vector<float>& mapping = map.GetMapping();
-			if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
-				const std::vector<Kha::Pos>& route = path_finder.GetRoute();
-				chaser.row = route.at(0).row;
-				chaser.col = route.at(0).col;
+		if(chaser.timer++%(10-chaser.speed)==0){
+			if(sqrt(pow(runner.row-chaser.row,2)+pow(runner.col-chaser.col,2))<30.0f){
+				const std::vector<float>& mapping = map.GetMapping();
+				if(path_finder.FindPath(mapping, map.rows, map.cols, chaser.row, chaser.col, runner.row, runner.col)){
+					const std::vector<Kha::Pos>& route = path_finder.GetRoute();
+					chaser.row = route.at(0).row;
+					chaser.col = route.at(0).col;
+				}
 			}
 			Entity& chaser_entity = *chaser.render_entity;
 			chaser_entity.drect.x = window_width*chaser.col/map.cols;
@@ -242,7 +241,7 @@ void GameResources::LoadNextLevel(SDL_Renderer* renderer){
 				std::stringstream(file_content[i])>>map.entrance_row>>map.entrance_col;
 				runner.row = map.entrance_row;
 				runner.col = map.entrance_col;
-				runner.speed = 6;
+				runner.speed = 7;
 			}else if(new_line==">map_exit"){
 				std::stringstream(file_content[i])>>map.exit_row>>map.exit_col;
 			}else if(new_line==">chasers"){
