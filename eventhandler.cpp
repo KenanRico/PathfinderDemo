@@ -4,6 +4,10 @@
 
 #include <SDL2/SDL.h>
 
+#define EVENTS_GOOD 0
+#define EVENTS_END_GAME 1
+
+
 EventHandler::EventHandler(): state(EVENTS_GOOD){
 	keys.resize(4, false);
 }

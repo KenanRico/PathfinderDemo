@@ -7,7 +7,8 @@
 #include "entity.h"
 #include "sdlresources.h"
 #include "eventhandler.h"
-#include "pathfinding/pathfinder.h"
+//#include "pathfinding/pathfinder.h"
+#include "pathfinding/include/pathfind.h"
 
 #include <deque>
 #include <stdint.h>
@@ -15,15 +16,6 @@
 #include <string>
 
 #include <SDL2/SDL.h>
-
-#define GAME_GOOD 0
-#define GAME_IMG_LOAD_FAIL 1
-#define GAME_LEVEL_LOAD_FAIL 2
-#define	GAME_LEVEL_LOAD_FAIL_NOLEVEL 3
-#define	GAME_LEVEL_LOAD_FAIL_UNRECOGNIZEDSETTING 4
-#define	GAME_LEVEL_LOAD_FAIL_BADFORMAT 5
-#define GAME_COMPLETE 6
-#define GAME_OVER 7
 
 class GameResources{
 	private:

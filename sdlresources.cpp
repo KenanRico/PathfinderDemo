@@ -6,6 +6,13 @@
 #include <SDL2/SDL.h>
 
 
+#define SDLR_GOOD 0
+#define SDLR_INIT_FAILED 1
+#define SDLR_WINDOW_CREATE_FAILED 2
+#define SDLR_RENDERER_CREATE_FAILED 3
+#define SDLR_RENDER_FAILED 4
+
+
 SDLResources::SDLResources(): state(SDLR_GOOD), window_width(800), window_height(600), frame_timestamp(0){
 	//init sdl
 	if(SDL_Init(SDL_INIT_EVERYTHING)!=0){

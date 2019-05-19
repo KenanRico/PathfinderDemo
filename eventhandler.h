@@ -6,9 +6,6 @@
 
 #include <SDL2/SDL.h>
 
-#define EVENTS_GOOD 0
-#define EVENTS_END_GAME 1
-
 class EventHandler{
 	public:
 		enum Keys { S=0, W=1, D=2, A=3 };

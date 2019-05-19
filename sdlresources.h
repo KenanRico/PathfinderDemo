@@ -6,12 +6,6 @@
 
 #include <SDL2/SDL.h>
 
-#define SDLR_GOOD 0
-#define SDLR_INIT_FAILED 1
-#define SDLR_WINDOW_CREATE_FAILED 2
-#define SDLR_RENDERER_CREATE_FAILED 3
-#define SDLR_RENDER_FAILED 4
-
 #define SDLR_FPS 60
 
 

@@ -2,8 +2,9 @@
 #include "map.h"
 #include "character.h"
 #include "eventhandler.h"
-#include "pathfinding/pathfinder.h"
-#include "pathfinding/pos.h"
+//#include "pathfinding/pathfinder.h"
+//#include "pathfinding/pos.h"
+#include "pathfinding/include/pathfind.h"
 
 #include <deque>
 #include <iostream>
@@ -15,6 +16,15 @@
 #include <SDL2/SDL.h>
 #include <SDL2/extensions/SDL_image.h>
 
+
+#define GAME_GOOD 0
+#define GAME_IMG_LOAD_FAIL 1
+#define GAME_LEVEL_LOAD_FAIL 2
+#define	GAME_LEVEL_LOAD_FAIL_NOLEVEL 3
+#define	GAME_LEVEL_LOAD_FAIL_UNRECOGNIZEDSETTING 4
+#define	GAME_LEVEL_LOAD_FAIL_BADFORMAT 5
+#define GAME_COMPLETE 6
+#define GAME_OVER 7
 
 
 GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), next_level("maps/level_1.map"){
