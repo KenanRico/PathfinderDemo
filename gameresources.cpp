@@ -28,6 +28,17 @@
 
 
 GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), next_level("maps/level_1.map"){
+	//config state info
+	state_info.resize(8);
+	state_info[0] = "OK";
+	state_info[1] = "Failed to load img";
+	state_info[2] = "Failed to load level";
+	state_info[3] = "Failed to load level (cannot find .map file)";
+	state_info[4] = "Failed to load level (unrecognized setting in .map file)";
+	state_info[5] = "Failed to load level (bad .map file formatting)";
+	state_info[6] = "Complete";
+	state_info[7] = "Over";
+	//alloc entities
 	entities.resize(5, Entity());
 	SDL_Renderer* r = sdl.GetRenderer();
 	//config map
@@ -76,7 +87,6 @@ GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), next_le
 	SDL_FreeSurface(surface);
 
 	LoadNextLevel(r);
-
 }
 
 GameResources::~GameResources(){
@@ -202,6 +212,10 @@ void GameResources::Render(const SDLResources& sdl){
 
 uint8_t GameResources::State() const{
 	return state;
+}
+
+const std::string& GameResources::StateStr() const{
+	return state_info.at(state);
 }
 
 

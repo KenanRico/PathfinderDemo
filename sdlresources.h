@@ -2,7 +2,8 @@
 #define SDL_RESOURCES_H
 //---------------------------------------
 
-//#include "entity.h"
+#include <vector>
+#include <string>
 
 #include <SDL2/SDL.h>
 
@@ -17,6 +18,7 @@ class SDLResources{
 		SDL_Renderer* renderer;
 		uint64_t frame_timestamp;
 		uint8_t state;
+		std::vector<std::string> state_info;
 	public:
 		SDLResources();
 		~SDLResources();
@@ -25,6 +27,7 @@ class SDLResources{
 		SDLResources& operator=(const SDLResources&) = delete;
 	public:
 		uint8_t State() const;
+		const std::string& StateStr() const;
 		SDL_Renderer* GetRenderer() const;
 		void Update();
 		int WindowW() const;

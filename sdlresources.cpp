@@ -14,6 +14,13 @@
 
 
 SDLResources::SDLResources(): state(SDLR_GOOD), window_width(800), window_height(600), frame_timestamp(0){
+	//config state info
+	state_info.resize(5);
+	state_info[0] = "Ok";
+	state_info[1] = "Failed to init SDL";
+	state_info[2] = "Failed to create window";
+	state_info[3] = "Failed to create renderer";
+	state_info[4] = "Failed to render";
 	//init sdl
 	if(SDL_Init(SDL_INIT_EVERYTHING)!=0){
 		state = SDLR_INIT_FAILED;
@@ -39,6 +46,10 @@ SDLResources::~SDLResources(){
 
 uint8_t SDLResources::State() const{
 	return state;
+}
+
+const std::string& SDLResources::StateStr() const{
+	return state_info.at(state);
 }
 
 SDL_Renderer* SDLResources::GetRenderer() const{

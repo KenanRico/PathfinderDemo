@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 #include <SDL2/SDL.h>
 
@@ -14,6 +15,7 @@ class EventHandler{
 		std::vector<bool> keys;
 		SDL_Event events;
 		uint8_t state;
+		std::vector<std::string> state_info;
 
 	public:
 		EventHandler();
@@ -26,6 +28,8 @@ class EventHandler{
 		bool KeyDown(uint8_t) const;
 		bool operator[](uint8_t) const;
 		uint8_t State() const;
+		const std::string& StateStr() const;
+
 };
 
 #endif

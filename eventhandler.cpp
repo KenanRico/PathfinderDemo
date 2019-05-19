@@ -1,6 +1,7 @@
 #include "eventhandler.h"
 
 #include <stdint.h>
+#include <string>
 
 #include <SDL2/SDL.h>
 
@@ -10,6 +11,9 @@
 
 EventHandler::EventHandler(): state(EVENTS_GOOD){
 	keys.resize(4, false);
+	state_info.resize(2);
+	state_info[0] = "OK";
+	state_info[1] = "Ended by user";
 }
 
 EventHandler::~EventHandler(){
@@ -59,4 +63,8 @@ bool EventHandler::operator[](uint8_t i) const{
 
 uint8_t EventHandler::State() const{
 	return state;
+}
+
+const std::string& EventHandler::StateStr() const{
+	return state_info.at(state);
 }

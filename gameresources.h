@@ -28,6 +28,7 @@ class GameResources{
 		bool level_complete;
 		std::string next_level;
 		uint8_t state;
+		std::vector<std::string> state_info;
 	public:
 		GameResources(const SDLResources&);
 		~GameResources();
@@ -40,6 +41,7 @@ class GameResources{
 		void Update(const EventHandler&, const SDLResources&);
 		void Render(const SDLResources&);
 		uint8_t State() const;
+		const std::string& StateStr() const;
 	private:
 		void LoadNextLevel(SDL_Renderer*);
 };
