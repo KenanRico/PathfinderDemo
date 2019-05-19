@@ -27,7 +27,7 @@
 #define GAME_OVER 7
 
 
-GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), next_level("maps/level_1.map"){
+GameResources::GameResources(const SDLResources& sdl): state(GAME_GOOD), next_level("maps/level_1.map"), level_complete(false){
 	//config state info
 	state_info.resize(8);
 	state_info[0] = "OK";
