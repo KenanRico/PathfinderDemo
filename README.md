@@ -49,6 +49,6 @@ All of which can be found in SDL2 bundle, downloadable at https://www.libsdl.org
 
 – Example config map (level\_1.map):
 
-![demo_map](./demo/mapconfig.png)
+![demo_map](./demo/mapconfig.PNG)
 
 
