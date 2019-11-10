@@ -47,6 +47,8 @@ All of which can be found in SDL2 bundle, downloadable at https://www.libsdl.org
 5. `chasers`: configuration of the paparazzis, each of whom is configured with 3 values: first two values represent spawning location [row, column], the 3<sup>rd</sup> value indicates speed
 6. `new_level`: file name of next level, end of game if left empty
 
-![demo_map](./demo/mapconfig.gif)
+– Example config map (level\_1.map):
+
+![demo_map](./demo/mapconfig.png)
 
 
